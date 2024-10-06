@@ -70,7 +70,7 @@ http.listen(3000, () => {
 });*/
 
 // Replace the uri string with your connection string.
-const uri = "mongodb+srv://farukjnu1:cjiDlz3wrTITdIdh@cluster0.uvxcgeh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb+srv://myDatabaseUser:D1fficultP%40ssw0rd@cluster0.example.mongodb.net/?retryWrites=true&w=majority";
 
 
 async function run() {
