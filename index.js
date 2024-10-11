@@ -6,8 +6,14 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 //var https = require('https');
 fs = require('fs');
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
 
 app.use('/files', express.static('files'));
+
 app.get('/images/Graphicloads-100-Flat-2-Chat-2.ico', (req, res) => {
     res.sendFile(__dirname + '/images/Graphicloads-100-Flat-2-Chat-2.ico');
 });
@@ -69,11 +75,12 @@ http.listen(3000, () => {
     });
 });*/
 
-// Replace the uri string with your connection string.
-const uri = "mongodb+srv://myDatabaseUser:D1fficultP%40ssw0rd@cluster0.example.mongodb.net/?retryWrites=true&w=majority";
 
+const uri =  "mongodb+srv://cluster0.uvxcgeh.mongodb.net/sample_mflix"; //--apiVersion 1";
+console.log(uri);
 
 async function run() {
+    const client = new MongoClient(uri);
   try {
     const database = client.db('sample_mflix');
     const movies = database.collection('movies');
@@ -88,11 +95,12 @@ async function run() {
 }
 //run().catch(console.dir);
 
-async function getProducts(_code) {
+async function getProducts() {
     const client = new MongoClient(uri);
     try {
         const database = client.db('ecommercedb');
         const products = database.collection('product');
+        console.log(products);
         return await products.find().toArray();
     } finally {
         // Ensures that the client will close when you finish/error
@@ -113,9 +121,45 @@ async function getProduct(_code) {
     }
 }
 
+async function addSalesOrder(data) {
+    const client = new MongoClient(uri);
+    try {
+        const database = client.db('ecommercedb');
+        const SalesOrders = database.collection('SalesOrder');
+
+        // Create an array of documents to insert
+        let docs =[];
+        console.log(data);
+        for(var i =0; i < data.products.length; i++){
+            docs.push({
+                customer: data.name,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                code: data.products[i].code,
+                price: data.products[i].price,
+                qty: data.products[i].qty,
+                total:data.products[i].total
+            });
+        }
+        
+        // Prevent additional documents from being inserted if one fails
+        const options = { ordered: true };
+
+        // Execute insert operation
+        const result = await SalesOrders.insertMany(docs, options);
+
+        return await client.close();
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
+}
+
 app.get('/api/product', (req, res) => {
     try {
-        getProduct('TS007').then(function(result) {
+        //req.query.code === 'TS007'  // true
+        getProduct(req.query.code).then(function(result) {
             console.log('/api/product');
             res.send(result);
          });
@@ -133,5 +177,17 @@ app.get('/api/products', (req, res) => {
          });
     } finally {
         // Ensures that the client will close when you finish/error
+    }
+});
+
+
+
+app.post('/api/createsales', function (req, res){
+    try {
+        addSalesOrder(req.body).then(function(result) {
+            console.log('/api/createsales');
+            res.sendStatus(200);
+         });
+    } finally {
     }
 });

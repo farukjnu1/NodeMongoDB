@@ -15,3 +15,7 @@ function getItemInLocalStorage(key){
         return JSON.parse(jsonString);
     }
 }
+
+function removeItemInLocalStorage(key){
+    localStorage.removeItem(key);
+}

@@ -9,6 +9,13 @@
 			| <a href="home">Home</a> | <a href="chat">Chat</a> | <a href="cart">Cart (<span id="productsCountInCart"></span>)</a>
 		</header>
 		<h1>Cart</h1>
+		<div id="form">
+			<label>Name : </label><input type="text" id="name" placeholder="your name" /><br />
+			<label>Phone : </label><input type="text" id="phone" placeholder="your phone" /><br />
+			<label>E-Mail : </label><input type="text" id="email" placeholder="your email" /><br />
+			<label>Address : </label> <textarea id="address" cols="10" rows="5" placeholder="your address"></textarea><br />
+			<button type="button" onclick="createSales();" id="btnSubmit">Submit</button>
+		</div>
 		<table border="1">
 			<thead>
 				<th>#</th>
@@ -17,12 +24,13 @@
 				<th>Price</th>
 				<th>Quantity</th>
 				<th>Total</th>
+				<th>#</th>
 			</thead>
 			<tbody id="products">
 
 			</tbody>
 			<tfoot>
-				<th colspan="4"></td>
+				<th colspan="5"></td>
 				<th>Grand Total:</td>
 				<th id="grandTotal" style="text-align: right;"></td>
 			</tfoot>
@@ -38,25 +46,96 @@
 				getProductInCart();
 			});
 
-			function getProductInCart(){
+			function getProductInCart() {
 				var listProduct = getItemInLocalStorage('cart');
-				if(listProduct!=null){
-						var products = '';
-						var grandTotal = 0;
-						for(var i=0;i<listProduct.length;i++){
-							products += '<tr>'
-							+'<td>'+'<img src="/files/'+listProduct[i].path+'" style="width:180px">'+ '</td>' 
-							+'<td>'+ listProduct[i].code + '</td>' 					
-							+'<td>'+ listProduct[i].name + '</td>' 
-							+'<td>'+ listProduct[i].price + '</td>' 
-							+'<td>'+ listProduct[i].qty + '</td>' 
-							+'<td>'+ listProduct[i].total + '</td>'				
-							+ '</tr>';
-							grandTotal +=parseFloat(listProduct[i].total);
-						}
-						document.getElementById('products').innerHTML = products;
-						document.getElementById('grandTotal').innerText = grandTotal;
+				if(listProduct!=null) {
+					var products = '';
+					var grandTotal = 0;
+					for(var i=0;i<listProduct.length;i++){
+						products += '<tr>'
+						+'<td>'+'<img src="/files/'+listProduct[i].path+'" style="width:180px">'+ '</td>' 
+						+'<td>'+ listProduct[i].code + '</td>' 					
+						+'<td>'+ listProduct[i].name + '</td>' 
+						+'<td>'+ listProduct[i].price + '</td>' 
+						+'<td>'+ listProduct[i].qty + '</td>' 
+						+'<td>'+ listProduct[i].total + '</td>'				
+						+'<td><button onclick="removeProductInCart('+i+');">Remove</button></td>'				
+						+ '</tr>';
+						grandTotal +=parseFloat(listProduct[i].total);
+					}
+					document.getElementById('products').innerHTML = products;
+					document.getElementById('grandTotal').innerText = grandTotal;
 				}
+			}
+
+			function removeProductInCart(index){
+				var listProduct = getItemInLocalStorage('cart');
+				var isConfirm = confirm('Are sure to remove the product from cart?');
+				if(isConfirm){
+					if(listProduct!=null){
+						if(listProduct.length > 0){
+							if (index > -1) {
+								listProduct.splice(index, 1);
+								setItemInLocalStorage('cart', JSON.stringify(listProduct));
+								getProductInCart();
+								countProductInCart();
+							}
+						}
+					}
+					
+				}
+			}
+
+			function createSales() {
+				var name = document.getElementById('name');
+				var phone = document.getElementById("phone");
+				var email = document.getElementById("email");
+				var address = document.getElementById("address");
+				var listProduct = getItemInLocalStorage('cart');
+				if(listProduct == null){
+					alert('add your product to cart first.');
+				}else if(listProduct.length == 0){
+					alert('add your product to cart first.');
+				} else if (name.value === undefined || name.value === "") {
+					alert('name is required');
+					name.focus();
+				} else if (phone.value === undefined || phone.value === "") {
+					alert('phone is required');
+					phone.focus();
+				} else if (email.value === undefined || email.value === "") {
+					alert('email is required');
+					phone.focus();
+				} else if (address.value === undefined || address.value === "") {
+					alert('address is required');
+					phone.focus();
+				} else {
+					document.getElementById("btnSubmit").innerText = "Submitting...";
+					document.getElementById("btnSubmit").disabled = true;
+					var jsObject = { name: name.value, email: email.value, phone: phone.value, address: address.value, products: listProduct };
+					var strJsObject = JSON.stringify(jsObject);
+					var xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function () {
+						if (this.readyState == 4 && this.status == 200) {
+							console.log(this.responseText);
+							resetSales();
+							countProductInCart();
+							getProductInCart();
+						}
+					};
+					xhttp.open("POST", "/api/createsales", true);
+					xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send(strJsObject);
+				}
+			}
+
+			function resetSales() {
+				document.getElementById('name').value = '';
+				document.getElementById('phone').value = '';
+				document.getElementById('email').value = '';
+				document.getElementById('address').value = '';
+				document.getElementById("btnSubmit").innerText = "Submit";
+				document.getElementById("btnSubmit").disabled = false;
+				removeItemInLocalStorage('cart');
 			}
 			
 		</script>

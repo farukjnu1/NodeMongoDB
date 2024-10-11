@@ -22,7 +22,7 @@
 				countProductInCart();
 			});
 
-			function addToCart(index){
+			function addToCart(index) {
 				var listProduct = getItemInLocalStorage('products');
 				var oProduct = listProduct[index];
 				var qty = document.getElementById('qty_'+index).value;
@@ -41,7 +41,7 @@
 				countProductInCart();
 			}
 				
-			function getProductsAsync(theUrl, callback){
+			function getProductsAsync(theUrl, callback) {
 				var xmlHttp = new XMLHttpRequest();
 				xmlHttp.onreadystatechange = function() { 
 					if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
