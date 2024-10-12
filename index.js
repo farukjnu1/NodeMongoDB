@@ -4,7 +4,8 @@ const app = express();
 var http = require('http').createServer(app);
 //var http = require('http');
 var io = require('socket.io')(http);
-//var https = require('https');
+var formidable = require('formidable');
+var https = require('https');
 fs = require('fs');
 const bodyParser = require('body-parser');
 
@@ -44,27 +45,7 @@ http.listen(3000, () => {
     console.log('listening on *:3000');
 });
 
-// app.get('/', (req, res) => {
-//     res.sendFile(__dirname + '/index.html');
-// });
-
-// app.get('/home', (req, res) => {
-//     res.sendFile(__dirname + '/index.html');
-// });
-
-
-/*fs.readFile('./index.html', function (err, html) {
-    if (err) {
-        throw err; 
-    }       
-    http.createServer(function(request, response) {  
-        response.writeHeader(200, {"Content-Type": "text/html"});  
-        response.write(html);  
-        response.end();  
-    }).listen(8000);
-});*/
-
-/*io.on('connection', (socket) => {
+io.on('connection', (socket) => {
     console.log('a user connected');
     socket.on('disconnect', () => {
         console.log('user disconnected');
@@ -73,10 +54,10 @@ http.listen(3000, () => {
         //onsole.log(msg);
         io.emit('chat message', msg);
     });
-});*/
+});
 
-
-const uri =  "mongodb+srv://cluster0.uvxcgeh.mongodb.net/sample_mflix"; //--apiVersion 1";
+const uri = "mongodb+srv://farukjnu1:0p1azmNbraHdSaUS@cluster0.uvxcgeh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+//const uri =  "<your-connection-string>";
 console.log(uri);
 
 async function run() {
@@ -139,7 +120,8 @@ async function addSalesOrder(data) {
                 code: data.products[i].code,
                 price: data.products[i].price,
                 qty: data.products[i].qty,
-                total:data.products[i].total
+                total:data.products[i].total,
+                date: new Date()
             });
         }
         
@@ -181,7 +163,6 @@ app.get('/api/products', (req, res) => {
 });
 
 
-
 app.post('/api/createsales', function (req, res){
     try {
         addSalesOrder(req.body).then(function(result) {
@@ -190,4 +171,22 @@ app.post('/api/createsales', function (req, res){
          });
     } finally {
     }
+});
+
+app.post('/uploadfile', function (req, res){
+    var strFilePath = '';
+    var form = new formidable.IncomingForm();
+
+    form.parse(req);
+
+    form.on('fileBegin', function (name, file){
+        file.path = __dirname + '/files/' + file.name;
+    });
+
+    form.on('file', function (name, file){
+        strFilePath = '/files/' + file.name;
+        res.send(JSON.stringify({"filePath":strFilePath,"fileName":file.name}));
+    });
+
+    //res.sendFile(__dirname + '/chat.html');
 });

@@ -2,6 +2,8 @@ function countProductInCart(){
     var listProduct = getItemInLocalStorage('cart');
     if(listProduct!=null){
         document.getElementById('productsCountInCart').innerText = listProduct.length;
+    }else{
+        document.getElementById('productsCountInCart').innerText = '';
     }
 }
 
