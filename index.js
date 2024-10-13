@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
 });
 
 const uri =  "<your-connection-string>";
+
 console.log(uri);
 
 async function run() {

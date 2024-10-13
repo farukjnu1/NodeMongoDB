@@ -9,21 +9,27 @@
 			| <a href="home">Home</a> | <a href="chat">Chat</a> | <a href="cart">Cart (<span id="productsCountInCart"></span>)</a>
 		</header>
 		<h1>Chat</h1>
+
+		<div id="divSignUp">
+			<label>Name:</label><input type="text" id="txtUser" /><input type="button" id="btnSignUp" value="Sign Up">
+		</div>
 		
 		<div id="divUser">
+
 			<strong>Welcome, </strong><span id="user"></span> 
-		</div>
 
-		<ul id="messages"></ul>
+			<ul id="messages"></ul>
 
-		<div id="dropContainer">
-			<form id="formFileUpload">
-			  <input type="file" name="upload" id="upload" multiple>
-			  <input type="submit" value="Upload">
-			</form>
-			<form action="" >
-			  <input id="m" autocomplete="off" /><button>Send</button>
-			</form>
+			<div id="dropContainer">
+				<!-- <form id="formFileUpload">
+				  <input type="file" name="upload" id="upload" multiple>
+				  <input type="submit" value="Upload">
+				</form> -->
+				<form action="" >
+				  <input id="m" autocomplete="off" /><button>Send</button>
+				</form>
+			</div>
+
 		</div>
 
 		<script src="/socket.io/socket.io.js"></script>
@@ -38,15 +44,33 @@
 			});
 
 
+			var oUserInfo = null;
 			$(function () {
-            	var strUserInfo = sessionStorage.getItem('userInfo');
-            	var oUserInfo = JSON.parse(strUserInfo);
+				$('#divSignUp').show();
+				$('#divUser').hide();
+
+				$('#btnSignUp').click(function(){
+              		oUserInfo = { userId : $('#txtUser').val() };
+              		sessionStorage.setItem('userInfo', JSON.stringify(oUserInfo));
+              		//window.location.replace("http://localhost:3000/chat");
+					$('#divSignUp').hide();
+					$('#divUser').show();
+
+					var strUserInfo = sessionStorage.getItem('userInfo');
+					oUserInfo = JSON.parse(strUserInfo);
+
+					$('#user').text(oUserInfo.userId);
+            	});
+
             	
-				if(oUserInfo===null){
-					window.location.replace("http://localhost:3000");
+            	
+				if(oUserInfo === null) {
+					//window.location.replace("http://localhost:3000");
+					$('#divSignUp').show();
+				$('#divUser').hide();
 				}
 
-            	$('#user').text(oUserInfo.userId);
+            	
             
             	var socket = io();
             	$('#dropContainer').submit(function(e) {
