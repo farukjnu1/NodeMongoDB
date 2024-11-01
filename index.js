@@ -56,7 +56,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const uri =  "<your-connection-string>";
+const uri =  "mongodb+srv://farukjnu1:0p1azmNbraHdSaUS@cluster0.uvxcgeh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 console.log(uri);
 
